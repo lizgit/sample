@@ -1,4 +1,5 @@
 <?php
+/* PreK12 Module: data modual for K12 Activities with methods to access activity data */
 include_once($_SERVER["DOCUMENT_ROOT"]."/lib/mysqlidb.php"); // reference to the database class	
 
 /* activity object */
@@ -15,10 +16,12 @@ class preK12Activity
 	}
 }
 
+// data provider with a pack of methods to access activiteis data
 class preK12Module
 {
 	public static $collegeList, $typeList;
-	
+
+	// 	creates an object from a database row
 	public static function getPreK12ActivityData($row)
 	{
 		$a = new preK12Activity();
@@ -26,15 +29,15 @@ class preK12Module
 		return $a;
 	}
 	
+	// gets an activity object by activity ID
 	public static function getPreK12Activity($aid)
 	{
 		$db = database::getInstance();
-		//$query = "SELECT * FROM PreK12Activities WHERE id=$aid";
-		//return $db->fetch_object($query,'preK12Module','getPreK12ActivityData');
 		$query = "SELECT * FROM PreK12Activities WHERE id=?"; 
 		return $db->fetch_object_params($query,array($aid),'preK12Module','getPreK12ActivityData');
 	}
-		
+	
+	// gets a list of activity objects by tag	
 	public static function getPreK12Activities($tag = NULL)
 	{
 		$db = database::getInstance();
@@ -44,6 +47,7 @@ class preK12Module
 		return $db->fetch_object_list($query,'preK12Module','getPreK12ActivityData');
 	}
 	
+	// gets a list of activities by search keywords
 	public static function searchPreK12Activities($keywords)
 	{
 		$db = database::getInstance();
@@ -57,6 +61,7 @@ class preK12Module
 		return $db->fetch_object_list($query,'preK12Module','getPreK12ActivityData');
 	}	
 
+	// returns the number of activities with certain status 
 	public static function countPreK12Activities($status)
 	{
 		$db = database::getInstance();
@@ -64,6 +69,7 @@ class preK12Module
 		return $db->query_scalar($query);
 	}
 	
+	// returns a $count number of activities of a certain status
 	public static function listPreK12Activities($count, $status=NULL)
 	{
 		$db = database::getInstance();
@@ -73,6 +79,7 @@ class preK12Module
 		return $db->fetch_asso_list($query,'id','title');
 	}
 	
+	// returns an associative array (id, tile) of upcoming activities
 	public static function listUpcomingPreK12Activities($count,$type=NULL)
 	{
 		$db = database::getInstance();
@@ -83,6 +90,7 @@ class preK12Module
 		return $db->fetch_asso_list($query,'id','title');
 	}
 
+	// returns an associative array(id, title) of activities with a given tag
 	public static function listPreK12ActivitiesByTag($tag)
 	{
 		$db = database::getInstance();
@@ -92,6 +100,7 @@ class preK12Module
 		return $db->fetch_asso_list($query,'id','title');
 	}
 	
+	// creates or updates an activity
 	public static function savePreK12Activity($a)
 	{
 		$db = database::getInstance();
@@ -118,6 +127,7 @@ class preK12Module
 		return $db->query_insert_update($insertSql,$updateSql,$a->id);
 	}
 	
+	// updates the status of an activity with given id
 	public static function updateActivityStatus($aid,$status)
 	{
 		$db = database::getInstance();
@@ -125,6 +135,7 @@ class preK12Module
 		return $db->query($query);
 	}
 	
+	// add an tag to an activity of given id
 	public static function addTag($aid, $tag)
 	{
 		$db = database::getInstance();
@@ -133,6 +144,7 @@ class preK12Module
 		return $db->query($query);
 	}
 	
+	// delete a tag to an activity of given id
 	public static function deleteTag($aid, $tag=NULL)
 	{
 		$db = database::getInstance();
@@ -142,6 +154,7 @@ class preK12Module
 		return $db->query($query);
 	}
 	
+	// returns a list of tags associated with an activity of given id
 	public static function listTags($aid)
 	{
 		$db = database::getInstance();
@@ -149,6 +162,7 @@ class preK12Module
 		return $db->fetch_list($query, 'tag');
 	}
 	
+	// returns a list of all tags associated to all approved activities
 	public static function listAllTags()
 	{
 		$db = database::getInstance();
@@ -160,6 +174,7 @@ class preK12Module
 	}	
 }
 
+// list of colleges
 preK12Module::$collegeList = array(
 	"AI"=>"Academic Innovation",
 	"Engineering"=>"Benjamin Statler College of Engineering and Mineral Resources",
@@ -183,7 +198,8 @@ preK12Module::$collegeList = array(
 	"UniversityCollege"=>"University College",
 	"WVUIT"=>"WVU Institute of Technology"
 	);
-	
+
+// list of activity types	
 preK12Module::$typeList = array("Class","Academic Camp","Academic Enrichment Day","Sport/Fitness Camp",
 						"Outreach/Service Project","Contest/Competition","Extension Service & 4-H","Other");
 
